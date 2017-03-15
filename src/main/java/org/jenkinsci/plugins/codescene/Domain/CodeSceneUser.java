@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.codescene.Domain;
 
+import java.util.Base64;
+
 public class CodeSceneUser {
 
     private final String name;
@@ -24,5 +26,11 @@ public class CodeSceneUser {
 
     public String password() {
         return password;
+    }
+
+    public String asBase64Encoded() {
+        final byte[] bs = (name + ":" + password).getBytes();
+
+        return Base64.getEncoder().encodeToString(bs);
     }
 }
