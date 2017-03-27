@@ -10,7 +10,7 @@
     Creates a text field that shows the value of the "name" property.
     When submitted, it will be passed to the corresponding constructor parameter.
   -->
-  <f:entry title="Name" field="name">
+  <f:entry title="Base Revision" field="baseRevision">
     <f:textbox />
   </f:entry>
 </j:jelly>
