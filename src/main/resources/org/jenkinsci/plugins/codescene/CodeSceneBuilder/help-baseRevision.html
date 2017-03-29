@@ -1,6 +1,10 @@
 <div>
-  Help file for fields are discovered through a file name convention. This file is
-  help for the "name" field. You can have <i>arbitrary</i> HTML here. You can write
-  this file as a Jelly script if you need a dynamic content (but if you do so, change
-  the extension to <tt>.jelly</tt>).
+  <p>
+    All commits in the build branch of the job, not present in the branch/ref specified by <em>Base Revision</em> (i.e.
+    the history difference between the job ref and <em>Base Revision</em>) will be used for a single delta analysis.
+  </p>
+  <p>
+    A common workflow is to build <code>feature/*</code> branches in Jenkins jobs, and use <code>origin/master</code>
+    as <em>Base Revision</em>. This effectively runs delta analyses on entire feature branches.
+  </p>
 </div>
