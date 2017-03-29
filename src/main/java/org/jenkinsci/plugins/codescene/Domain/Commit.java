@@ -18,7 +18,7 @@ public class Commit {
         final Matcher m = hashPattern.matcher(hash);
 
         if (!m.matches()) {
-            throw new IllegalArgumentException("The given commit " + hash + " does not represent a valid Git hash.");
+            throw new IllegalArgumentException("The given commit '" + hash + "' does not represent a valid Git hash.");
         }
 
         v = hash;

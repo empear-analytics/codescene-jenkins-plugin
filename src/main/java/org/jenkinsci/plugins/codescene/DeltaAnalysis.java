@@ -28,7 +28,7 @@ public class DeltaAnalysis {
         final DeltaAnalysisRequest payload = new DeltaAnalysisRequest(commits, config.gitRepisitoryToAnalyze());
 
         try {
-            return synchronousRequestWith(payload);
+            return synchronousRequestWith(payload, commits);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("The configured CodeScene URL isn't valid", e);
         } catch (IOException e) {
@@ -37,7 +37,7 @@ public class DeltaAnalysis {
     }
 
 
-    private DeltaAnalysisResult synchronousRequestWith(final DeltaAnalysisRequest payload) throws URISyntaxException, IOException {
+    private DeltaAnalysisResult synchronousRequestWith(final DeltaAnalysisRequest payload, Commits commits) throws URISyntaxException, IOException {
         final HttpPost codeSceneRequest = createRequestFor(payload);
         final CloseableHttpClient httpclient = HttpClients.createDefault();
 
@@ -46,7 +46,7 @@ public class DeltaAnalysis {
             final StatusLine status = rawResponse.getStatusLine();
 
             if (HttpStatus.SC_CREATED == status.getStatusCode()) {
-                return parseSuccessfulAnalysisResults(rawResponse);
+                return parseSuccessfulAnalysisResults(rawResponse, commits);
             }
 
             reportFailureAsException(rawResponse);
@@ -59,25 +59,13 @@ public class DeltaAnalysis {
     }
 
     private void reportFailureAsException(HttpResponse rawResponse) throws IOException {
-
-        if (rawResponse.containsHeader("Content-Type")) {
-            final Header contentType = rawResponse.getFirstHeader("Content-Type");
-
-            if (contentType != null && contentType.getValue().equals("text/plain")) {
-                final HttpEntity responseBody = rawResponse.getEntity();
-
-                final String errorMessage = EntityUtils.toString(responseBody);
-
-                throw new RuntimeException("Failed to execute delta analysis. Reason: " + errorMessage);
-            }
-        }
-
-        throw new RuntimeException("Failed to execute delta analysis - check the CodeScene logs. HTTP response code: " + rawResponse.getStatusLine().getStatusCode());
+        final HttpEntity responseBody = rawResponse.getEntity();
+        final String errorMessage = EntityUtils.toString(responseBody);
+        throw new RuntimeException("Failed to execute delta analysis. Reason: " + errorMessage);
     }
 
-    private DeltaAnalysisResult parseSuccessfulAnalysisResults(HttpResponse rawResponse) throws IOException {
+    private DeltaAnalysisResult parseSuccessfulAnalysisResults(HttpResponse rawResponse, Commits commits) throws IOException {
         final HttpEntity responseBody = rawResponse.getEntity();
-        System.out.println("Got 201 response!");
 
         if (responseBody == null) {
             throw new RuntimeException("Internal error: The delta analysis was a success but failed to parse the returned results");
@@ -86,7 +74,7 @@ public class DeltaAnalysis {
         final JsonReader reader = Json.createReader(responseBody.getContent());
         final JsonObject delta = reader.readObject();
 
-        return new DeltaAnalysisResult(delta);
+        return new DeltaAnalysisResult(commits, delta);
     }
 
     private HttpPost createRequestFor(final DeltaAnalysisRequest payload) throws URISyntaxException {

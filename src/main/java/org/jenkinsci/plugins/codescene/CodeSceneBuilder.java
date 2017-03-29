@@ -1,23 +1,24 @@
 package org.jenkinsci.plugins.codescene;
+
 import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.util.FormValidation;
-import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
+import org.jenkinsci.plugins.codescene.Domain.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.QueryParameter;
 
-import javax.servlet.ServletException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 
 public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
 
@@ -36,32 +37,67 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         return baseRevision;
     }
 
+    private ArrayList<Commits> parseCommits(String output) {
+        ArrayList<Commits> commitSets = new ArrayList<>();
+        for (String line : output.split("\n")) {
+            String trimmed = line.trim();
+            if (!trimmed.isEmpty()) {
+                commitSets.add(Commits.from(new Commit(trimmed)));
+            }
+        }
+        return commitSets;
+    }
+
+    private ArrayList<CodeSceneBuildActionEntry> runDeltaAnalyses(Configuration config, String output, TaskListener listener) throws MalformedURLException {
+        ArrayList<Commits> commitSets = parseCommits(output);
+        ArrayList<CodeSceneBuildActionEntry> entries = new ArrayList<>(commitSets.size());
+
+        if (!commitSets.isEmpty()) {
+            listener.getLogger().format("Starting delta analysis on %d commit(s)...\n", commitSets.size());
+            for (Commits commits : commitSets) {
+                DeltaAnalysis deltaAnalysis = new DeltaAnalysis(config);
+                listener.getLogger().format("Running delta analysis on commits (%s) in repository %s.\n", commits.value(), config.gitRepisitoryToAnalyze().value());
+                DeltaAnalysisResult result = deltaAnalysis.runOn(commits);
+
+                URL detailsUrl = new URL(
+                        config.codeSceneUrl().getProtocol(),
+                        config.codeSceneUrl().getHost(),
+                        config.codeSceneUrl().getPort(),
+                        result.getViewUrl());
+                entries.add(new CodeSceneBuildActionEntry(commits.value(), result.getRisk(), result.getWarnings().value(), detailsUrl));
+            }
+        } else {
+            listener.getLogger().format("No commits to run delta analysis on.\n");
+        }
+
+        return entries;
+    }
+
     @Override
-    public void perform(Run<?,?> build, FilePath workspace, Launcher launcher, TaskListener listener) {
-        // This is where you 'build' the project.
-        // Since this is a dummy, we just say 'hello world' and call that a build.
-
-
+    public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) {
         try {
+            URL codesceneUrl = new URL("http", "localhost", 3003, "/projects/13/delta-analysis");
+            CodeSceneUser codeSceneUser = new CodeSceneUser("Foo", "Foo");
+            Repository codeSceneGitRepository = new Repository("empear-enterprise");
+            Configuration codesceneConfig = new Configuration(codesceneUrl, codeSceneUser, codeSceneGitRepository);
             EnvVars env = build.getEnvironment(listener);
-            listener.getLogger().println(workspace);
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-            int code = launcher.launch()
+            launcher.launch()
                     .cmdAsSingleString(String.format("git log --pretty='%%H' %s..%s", getBaseRevision(), env.get("GIT_COMMIT")))
                     .pwd(workspace)
                     .envs(build.getEnvironment(listener))
                     .stdout(out)
                     .join();
 
-            listener.getLogger().println("Exit: " + code);
-            listener.getLogger().println(out.toString());
+            ArrayList<CodeSceneBuildActionEntry> entries = runDeltaAnalyses(codesceneConfig, out.toString(), listener);
+            build.addAction(new CodeSceneBuildAction(entries));
 
         } catch (InterruptedException e) {
-            listener.error("Failed to run git command", e);
+            listener.error("Failed to run delta analysis", e);
         } catch (IOException e) {
-            listener.error("Failed to run git command", e);
+            listener.error("Failed to run delta analysis", e);
         }
     }
 

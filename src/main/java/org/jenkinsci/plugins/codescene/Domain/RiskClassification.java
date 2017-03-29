@@ -7,13 +7,13 @@ public class RiskClassification {
     public RiskClassification(int risk) {
 
         if (risk > 10 || risk < 0) {
-            throw new IllegalArgumentException("Risk has to be an ordinal between 1 and 10. Your risk value of " + risk + " doesn't match that constraint.");
+            throw new IllegalArgumentException("Risk has to be an ordinal between 1 and 10. Your getRisk value of " + risk + " doesn't match that constraint.");
         }
 
         this.risk = risk;
     }
 
-    public int value() {
+    public int getValue() {
         return risk;
     }
 }

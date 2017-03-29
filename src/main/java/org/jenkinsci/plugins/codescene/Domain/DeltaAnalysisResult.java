@@ -2,21 +2,24 @@ package org.jenkinsci.plugins.codescene.Domain;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DeltaAnalysisResult {
+    private final String viewUrl;
+    private final Commits commits;
     private final RiskClassification risk;
     private final Warnings warnings;
 
-    public DeltaAnalysisResult(final JsonObject result) {
+    public DeltaAnalysisResult(final Commits commits, final JsonObject result) {
         ensureTheVersionIsSupported(result);
 
         final JsonObject deltaResult = result.getJsonObject("result");
 
+        viewUrl = result.getString("view");
         risk = riskFrom(deltaResult);
         warnings = warningsFrom(deltaResult);
+        this.commits = commits;
     }
 
     private RiskClassification riskFrom(JsonObject deltaResult) {
@@ -39,7 +42,7 @@ public class DeltaAnalysisResult {
                 ds.add(jsonDetails.getString(j));
             }
 
-            final WarningDetails details = WarningDetails.from(ds);
+            final List<String> details = new ArrayList<>(ds);
 
             ws.add(new Warning(category, details));
         }
@@ -55,11 +58,19 @@ public class DeltaAnalysisResult {
         }
     }
 
-    public RiskClassification risk() {
+    public String getViewUrl() {
+        return viewUrl;
+    }
+
+    public Commits getCommits() {
+        return commits;
+    }
+
+    public RiskClassification getRisk() {
         return risk;
     }
 
-    public Warnings warnings() {
+    public Warnings getWarnings() {
         return warnings;
     }
 }
