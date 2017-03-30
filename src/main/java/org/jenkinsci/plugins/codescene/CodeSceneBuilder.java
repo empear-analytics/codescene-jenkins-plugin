@@ -31,11 +31,20 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     private final boolean analyzeBranchDiff;
     private final String baseRevision;
 
+    private final String username;
+    private final String password;
+    private final URL deltaAnalysisUrl;
+    private final String repository;
+
     @DataBoundConstructor
-    public CodeSceneBuilder(boolean analyzeLatestIndividually, boolean analyzeBranchDiff, String baseRevision) {
+    public CodeSceneBuilder(boolean analyzeLatestIndividually, boolean analyzeBranchDiff, String baseRevision, String username, String password, URL deltaAnalysisUrl, String repository) {
         this.analyzeLatestIndividually = analyzeLatestIndividually;
         this.analyzeBranchDiff = analyzeBranchDiff;
         this.baseRevision = baseRevision;
+        this.username = username;
+        this.password = password;
+        this.deltaAnalysisUrl = deltaAnalysisUrl;
+        this.repository = repository;
     }
 
     public boolean getAnalyzeLatestIndividually() {
@@ -45,8 +54,25 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     public boolean getAnalyzeBranchDiff() {
         return analyzeBranchDiff;
     }
+
     public String getBaseRevision() {
         return baseRevision;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public URL getDeltaAnalysisUrl() {
+        return deltaAnalysisUrl;
+    }
+
+    public String getRepository() {
+        return repository;
     }
 
     private Commits revisionsAsCommitSet(List<String> revisions) {
@@ -119,10 +145,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         }
 
         try {
-            URL codesceneUrl = new URL("http", "localhost", 3003, "/projects/13/delta-analysis");
-            CodeSceneUser codeSceneUser = new CodeSceneUser("Foo", "Foo");
-            Repository codeSceneGitRepository = new Repository("empear-enterprise");
-            Configuration codesceneConfig = new Configuration(codesceneUrl, codeSceneUser, codeSceneGitRepository);
+            Configuration codesceneConfig = new Configuration(deltaAnalysisUrl, new CodeSceneUser(username, password), new Repository(repository));
             EnvVars env = build.getEnvironment(listener);
 
             String previousCommit = env.get("GIT_PREVIOUS_SUCCESSFUL_COMMIT");

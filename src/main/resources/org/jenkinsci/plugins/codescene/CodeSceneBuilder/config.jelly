@@ -2,14 +2,32 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
-    ${it.analyzeLatestIndividually}
-    <f:optionalBlock field="analyzeLatestIndividually" title="Individual Commits" inline="true">
-    </f:optionalBlock>
+    <f:section title="Delta Analysis Settings">
 
-    <f:optionalBlock field="analyzeBranchDiff" title="By Branch" inline="true">
-        <f:entry title="Base Revision" field="baseRevision">
-            <f:textbox/>
+        <f:optionalBlock field="analyzeLatestIndividually" title="Individual Commits" inline="true">
+        </f:optionalBlock>
+
+        <f:optionalBlock field="analyzeBranchDiff" title="By Branch" inline="true">
+            <f:entry title="Base Revision">
+                <f:textbox field="baseRevision" />
+            </f:entry>
+        </f:optionalBlock>
+
+    </f:section>
+
+    <f:section title="CodeScene API Configuration">
+        <f:entry title="Bot User">
+            <f:textbox field="username" value="${it.username}" />
         </f:entry>
-    </f:optionalBlock>
+        <f:entry title="Bot Password">
+            <f:password field="password" value="${it.password}"/>
+        </f:entry>
+        <f:entry title="Project Delta Analysis URL">
+            <f:textbox field="deltaAnalysisUrl" value="${it.deltaAnalysisUrl}"/>
+        </f:entry>
+        <f:entry title="Repository">
+            <f:textbox field="repository" value="${it.repository}"/>
+        </f:entry>
+    </f:section>
 
 </j:jelly>

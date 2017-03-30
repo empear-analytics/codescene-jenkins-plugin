@@ -61,7 +61,7 @@ public class DeltaAnalysis {
     private void reportFailureAsException(HttpResponse rawResponse) throws IOException {
         final HttpEntity responseBody = rawResponse.getEntity();
         final String errorMessage = EntityUtils.toString(responseBody);
-        throw new RuntimeException("Failed to execute delta analysis. Reason: " + errorMessage);
+        throw new RuntimeException(String.format("Failed to execute delta analysis. Status: %s, Reason: %s", rawResponse.getStatusLine(), errorMessage));
     }
 
     private DeltaAnalysisResult parseSuccessfulAnalysisResults(HttpResponse rawResponse, Commits commits) throws IOException {
