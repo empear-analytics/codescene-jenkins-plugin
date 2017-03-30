@@ -6,7 +6,7 @@
     <f:optionalBlock field="analyzeLatestIndividually" title="Individual Commits" inline="true">
     </f:optionalBlock>
 
-    <f:optionalBlock name="analyzeBranchDiff" title="By Branch" inline="true">
+    <f:optionalBlock field="analyzeBranchDiff" title="By Branch" inline="true">
         <f:entry title="Base Revision" field="baseRevision">
             <f:textbox/>
         </f:entry>

@@ -17,7 +17,7 @@ public class Commits {
         return new Commits(Arrays.asList(a));
     }
 
-    private Commits(List<Commit> cs) {
+    public Commits(List<Commit> cs) {
         vs = cs;
     }
 

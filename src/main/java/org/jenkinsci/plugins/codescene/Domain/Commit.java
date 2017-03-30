@@ -27,4 +27,9 @@ public class Commit {
     public String value() {
         return v;
     }
+
+    @Override
+    public String toString() {
+        return v;
+    }
 }

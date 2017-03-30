@@ -8,16 +8,28 @@ import java.net.URL;
 import java.util.List;
 
 public class CodeSceneBuildActionEntry {
+    private final String title;
+    private final boolean showCommits;
     private final List<Commit> commits;
     private final RiskClassification risk;
     private final List<Warning> warnings;
     private final URL viewUrl;
 
-    public CodeSceneBuildActionEntry(List<Commit> commits, RiskClassification risk, List<Warning> warnings, URL viewUrl) {
+    public CodeSceneBuildActionEntry(String title, boolean showCommits, List<Commit> commits, RiskClassification risk, List<Warning> warnings, URL viewUrl) {
+        this.title = title;
+        this.showCommits = showCommits;
         this.commits = commits;
         this.risk = risk;
         this.warnings = warnings;
         this.viewUrl = viewUrl;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public boolean getShowCommits() {
+        return showCommits;
     }
 
     public List<Commit> getCommits() {
@@ -38,19 +50,5 @@ public class CodeSceneBuildActionEntry {
 
     public URL getViewUrl() {
         return viewUrl;
-    }
-
-    public String getTitle() {
-        switch (commits.size()) {
-            case 0: return "No Commits";
-            case 1: return commits.get(0).value();
-            default:
-                StringBuilder builder = new StringBuilder();
-                for (Commit c : commits) {
-                    builder.append(c.value());
-                    builder.append(", ");
-                }
-                return builder.toString();
-        }
     }
 }
