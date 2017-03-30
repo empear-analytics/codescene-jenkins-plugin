@@ -22,17 +22,20 @@ import java.util.ArrayList;
 
 public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
 
+    private final boolean analyzeLatestIndividually;
     private final String baseRevision;
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
-    public CodeSceneBuilder(String baseRevision) {
+    public CodeSceneBuilder(boolean analyzeLatestIndividually, String baseRevision) {
+        this.analyzeLatestIndividually = analyzeLatestIndividually;
         this.baseRevision = baseRevision;
     }
 
-    /**
-     * We'll use this from the {@code config.jelly}.
-     */
+    public boolean getAnalyzeLatestIndividually() {
+        return analyzeLatestIndividually;
+    }
+
     public String getBaseRevision() {
         return baseRevision;
     }
@@ -76,6 +79,11 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     @Override
     public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) {
         try {
+            if (!getAnalyzeLatestIndividually()) {
+                listener.getLogger().println("Not analyzing individual commits.");
+                return;
+            }
+
             URL codesceneUrl = new URL("http", "localhost", 3003, "/projects/13/delta-analysis");
             CodeSceneUser codeSceneUser = new CodeSceneUser("Foo", "Foo");
             Repository codeSceneGitRepository = new Repository("empear-enterprise");

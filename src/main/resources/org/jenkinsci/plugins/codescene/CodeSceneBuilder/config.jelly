@@ -1,32 +1,15 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <!--
-      This jelly script is used for per-project configuration.
 
-      See global.jelly for a general discussion about jelly script.
-    -->
+    ${it.analyzeLatestIndividually}
+    <f:optionalBlock field="analyzeLatestIndividually" title="Individual Commits" inline="true">
+    </f:optionalBlock>
 
-    <!--
-      Creates a text field that shows the value of the "name" property.
-      When submitted, it will be passed to the corresponding constructor parameter.
-    -->
-    <f:section title="By Branch">
-        <f:optionalBlock name="analyzeBranchDiff" title="Analyze branch difference">
-            <f:entry title="Base Revision" field="baseRevision">
-                <f:textbox/>
-            </f:entry>
-        </f:optionalBlock>
-    </f:section>
-
-    <f:section title="Individual Commits">
-        <f:block>
-            <f:entry field="analyzeLatestIndividually">
-                <f:checkbox title="Analyze new commits individually"/>
-            </f:entry>
-        </f:block>
-    </f:section>
-
-
+    <f:optionalBlock name="analyzeBranchDiff" title="By Branch" inline="true">
+        <f:entry title="Base Revision" field="baseRevision">
+            <f:textbox/>
+        </f:entry>
+    </f:optionalBlock>
 
 </j:jelly>

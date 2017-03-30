@@ -36,7 +36,7 @@
             .codescene-delta-analysis-action .risk {
                 position: absolute;
                 top: 0;
-                right: 0;
+                left: 0;
                 padding: 0 10px;
                 text-align: center;
                 background: #ffdc00;
@@ -132,13 +132,8 @@
                         </div>
                     </div>
 
-                    <div class="body">
-                        <j:if test="${!entry.hasWarnings}">
-                          <p class="missing"><l:icon class="icon-green icon-sm"/> No Warnings</p>
-                        </j:if>
-
-                        <j:if test="${entry.hasWarnings}">
-                            <h4><l:icon class="icon-yellow icon-sm"/> Warnings</h4>
+                    <j:if test="${entry.hasWarnings}">
+                        <div class="body">
                             <ul>
                                 <j:forEach var="warning" items="${entry.warnings}">
                                     <li><h5 class="category">${warning.category}</h5>
@@ -150,8 +145,8 @@
                                     </li>
                                 </j:forEach>
                             </ul>
-                        </j:if>
-                    </div>
+                        </div>
+                    </j:if>
 
                 </div>
             </j:forEach>
