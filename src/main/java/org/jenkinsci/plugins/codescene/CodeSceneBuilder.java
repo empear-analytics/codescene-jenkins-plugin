@@ -38,11 +38,11 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
 
     private final String username;
     private final String password;
-    private final URL deltaAnalysisUrl;
+    private final String deltaAnalysisUrl;
     private final String repository;
 
     @DataBoundConstructor
-    public CodeSceneBuilder(boolean analyzeLatestIndividually, boolean analyzeBranchDiff, String baseRevision, boolean markBuildAsUnstable, int riskThreshold, String username, String password, URL deltaAnalysisUrl, String repository) {
+    public CodeSceneBuilder(boolean analyzeLatestIndividually, boolean analyzeBranchDiff, String baseRevision, boolean markBuildAsUnstable, int riskThreshold, String username, String password, String deltaAnalysisUrl, String repository) {
         this.analyzeLatestIndividually = analyzeLatestIndividually;
         this.analyzeBranchDiff = analyzeBranchDiff;
         this.baseRevision = baseRevision;
@@ -82,7 +82,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         return password;
     }
 
-    public URL getDeltaAnalysisUrl() {
+    public String getDeltaAnalysisUrl() {
         return deltaAnalysisUrl;
     }
 
@@ -161,7 +161,8 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         }
 
         try {
-            Configuration codesceneConfig = new Configuration(deltaAnalysisUrl, new CodeSceneUser(username, password), new Repository(repository));
+            URL url = new URL(deltaAnalysisUrl);
+            Configuration codesceneConfig = new Configuration(url, new CodeSceneUser(username, password), new Repository(repository));
             EnvVars env = build.getEnvironment(listener);
 
             String previousCommit = env.get("GIT_PREVIOUS_SUCCESSFUL_COMMIT");
@@ -188,9 +189,11 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
             }
 
         } catch (InterruptedException e) {
-            listener.error("Failed to run delta analysis", e);
+            listener.error("Failed to run delta analysis: %s", e);
+            build.setResult(Result.FAILURE);
         } catch (IOException e) {
-            listener.error("Failed to run delta analysis", e);
+            listener.error("Failed to run delta analysis: %s", e);
+            build.setResult(Result.FAILURE);
         }
     }
 
@@ -266,6 +269,43 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                                                   @QueryParameter String baseRevision) throws IOException, ServletException {
             if (analyzeBranchDiff && (baseRevision == null || baseRevision.isEmpty())) {
                 return FormValidation.error("Base revision cannot be empty.");
+            } else {
+                return FormValidation.ok();
+            }
+        }
+
+        public FormValidation doCheckUsername(@QueryParameter String username) {
+            if (username == null || username.isEmpty()) {
+                return FormValidation.error("CodeScene bot user name cannot be blank.");
+            } else {
+                return FormValidation.ok();
+            }
+        }
+
+        public FormValidation doCheckPassword(@QueryParameter String password) {
+            if (password == null || password.isEmpty()) {
+                return FormValidation.error("CodeScene bot password cannot be blank.");
+            } else {
+                return FormValidation.ok();
+            }
+        }
+
+        public FormValidation doCheckDeltaAnalysisUrl(@QueryParameter String deltaAnalysisUrl) {
+            if (deltaAnalysisUrl == null || deltaAnalysisUrl.isEmpty()) {
+                return FormValidation.error("CodeScene delta analysis URL cannot be blank.");
+            } else {
+                try {
+                    new URL(deltaAnalysisUrl);
+                    return FormValidation.ok();
+                } catch (MalformedURLException e) {
+                    return FormValidation.error("Invalid URL");
+                }
+            }
+        }
+
+        public FormValidation doCheckRepository(@QueryParameter String repository) {
+            if (repository == null || repository.isEmpty()) {
+                return FormValidation.error("CodeScene repository cannot be blank.");
             } else {
                 return FormValidation.ok();
             }
