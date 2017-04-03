@@ -14,14 +14,16 @@ public class CodeSceneBuildActionEntry {
     private final RiskClassification risk;
     private final List<Warning> warnings;
     private final URL viewUrl;
+    private final int riskThreshold;
 
-    public CodeSceneBuildActionEntry(String title, boolean showCommits, List<Commit> commits, RiskClassification risk, List<Warning> warnings, URL viewUrl) {
+    public CodeSceneBuildActionEntry(String title, boolean showCommits, List<Commit> commits, RiskClassification risk, List<Warning> warnings, URL viewUrl, int riskThreshold) {
         this.title = title;
         this.showCommits = showCommits;
         this.commits = commits;
         this.risk = risk;
         this.warnings = warnings;
         this.viewUrl = viewUrl;
+        this.riskThreshold = riskThreshold;
     }
 
     public String getTitle() {
@@ -50,5 +52,13 @@ public class CodeSceneBuildActionEntry {
 
     public URL getViewUrl() {
         return viewUrl;
+    }
+
+    public int getRiskThreshold() {
+        return riskThreshold;
+    }
+
+    public boolean getHitsRiskThreshold() {
+        return risk.getValue() >= riskThreshold;
     }
 }

@@ -4,6 +4,8 @@ import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.console.HyperlinkNote;
+import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.Builder;
@@ -31,16 +33,21 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     private final boolean analyzeBranchDiff;
     private final String baseRevision;
 
+    private final boolean markBuildAsUnstable;
+    private final int riskThreshold;
+
     private final String username;
     private final String password;
     private final URL deltaAnalysisUrl;
     private final String repository;
 
     @DataBoundConstructor
-    public CodeSceneBuilder(boolean analyzeLatestIndividually, boolean analyzeBranchDiff, String baseRevision, String username, String password, URL deltaAnalysisUrl, String repository) {
+    public CodeSceneBuilder(boolean analyzeLatestIndividually, boolean analyzeBranchDiff, String baseRevision, boolean markBuildAsUnstable, int riskThreshold, String username, String password, URL deltaAnalysisUrl, String repository) {
         this.analyzeLatestIndividually = analyzeLatestIndividually;
         this.analyzeBranchDiff = analyzeBranchDiff;
         this.baseRevision = baseRevision;
+        this.markBuildAsUnstable = markBuildAsUnstable;
+        this.riskThreshold = riskThreshold;
         this.username = username;
         this.password = password;
         this.deltaAnalysisUrl = deltaAnalysisUrl;
@@ -57,6 +64,14 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
 
     public String getBaseRevision() {
         return baseRevision;
+    }
+
+    public boolean getMarkBuildAsUnstable() {
+        return markBuildAsUnstable;
+    }
+
+    public int getRiskThreshold() {
+        return riskThreshold;
     }
 
     public String getUsername() {
@@ -114,7 +129,8 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                         commits.value(),
                         result.getRisk(),
                         result.getWarnings().value(),
-                        detailsUrl));
+                        detailsUrl,
+                        riskThreshold));
             }
         } else {
             listener.getLogger().format("No commits to run delta analysis on.\n");
@@ -135,7 +151,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                 config.codeSceneUrl().getPort(),
                 result.getViewUrl());
 
-        return new CodeSceneBuildActionEntry(branchName, true, commitSet.value(), result.getRisk(), result.getWarnings().value(), detailsUrl);
+        return new CodeSceneBuildActionEntry(branchName, true, commitSet.value(), result.getRisk(), result.getWarnings().value(), detailsUrl, riskThreshold);
     }
 
     @Override
@@ -158,12 +174,16 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                     listener.getLogger().println("No new commits to analyze individually for this build.");
                 } else {
                     ArrayList<CodeSceneBuildActionEntry> entries = runDeltaAnalysesOnIndividualCommits(codesceneConfig, revisions, listener);
+                    for (CodeSceneBuildActionEntry entry : entries) {
+                        markAsUnstableWhenAtRiskThreshold(riskThreshold, entry, build, listener);
+                    }
                     build.addAction(new CodeSceneBuildAction("Delta - Individual Commits", entries));
                 }
             }
             if (getAnalyzeBranchDiff() && getBaseRevision() != null) {
                 List<String> revisions = getCommitRange(build, workspace, launcher, listener, getBaseRevision(), currentCommit);
                 CodeSceneBuildActionEntry entry = runDeltaAnalysisOnBranchDiff(codesceneConfig, revisions, branch, listener);
+                markAsUnstableWhenAtRiskThreshold(riskThreshold, entry, build, listener);
                 build.addAction(new CodeSceneBuildAction("Delta - By Branch", Arrays.asList(entry)));
             }
 
@@ -171,6 +191,20 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
             listener.error("Failed to run delta analysis", e);
         } catch (IOException e) {
             listener.error("Failed to run delta analysis", e);
+        }
+    }
+
+    private void markAsUnstableWhenAtRiskThreshold(int threshold, CodeSceneBuildActionEntry entry, Run<?, ?> build, TaskListener listener) throws IOException {
+        if (getMarkBuildAsUnstable() && entry.getHitsRiskThreshold()) {
+            String link = HyperlinkNote.encodeTo(entry.getViewUrl().toExternalForm(), String.format("Delta analysis result with risk %d", entry.getRisk().getValue()));
+            listener.error("%s hits the risk threshold (%d). Marking build as unstable.", link, threshold);
+            Result newResult = Result.UNSTABLE;
+
+            Result result = build.getResult() != null
+                    ? build.getResult().combine(newResult)
+                    : newResult;
+
+            build.setResult(result);
         }
     }
 

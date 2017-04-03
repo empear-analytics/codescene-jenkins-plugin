@@ -13,6 +13,11 @@
             </f:entry>
         </f:optionalBlock>
 
+        <f:optionalBlock field="markBuildAsUnstable" title="Mark as Unstable on High Risk" inline="true">
+            <f:entry title="Risk Threshold">
+                <f:number field="riskThreshold" value="${it.riskThreshold}" />
+            </f:entry>
+        </f:optionalBlock>
     </f:section>
 
     <f:section title="CodeScene API Configuration">

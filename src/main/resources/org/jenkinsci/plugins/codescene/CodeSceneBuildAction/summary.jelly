@@ -44,6 +44,9 @@
                 height: 50px;
                 width: 50px;
             }
+            .codescene-delta-analysis-action .risk.hits-risk-threshold {
+                background: #fe6849;
+            }
 
             .codescene-delta-analysis-action .risk h4 {
                 margin: 8px 0 0;
@@ -106,6 +109,10 @@
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
             }
+            .codescene-delta-analysis-action p.hits-risk-threshold {
+                color: #fe6849;
+                font-weight: bold;
+            }
 
         </style>
         <div class="codescene-delta-analysis-action">
@@ -120,13 +127,26 @@
                             </a>
                         </h3>
 
-                        <div class="risk">
-                            <h4>Risk</h4>
-                            <span class="value">${entry.risk.value}</span>
-                        </div>
+
+                        <j:if test="${entry.hitsRiskThreshold}">
+                            <div class="risk hits-risk-threshold">
+                                <h4>Risk</h4>
+                                <span class="value">${entry.risk.value}</span>
+                            </div>
+                        </j:if>
+                        <j:if test="${!entry.hitsRiskThreshold}">
+                            <div class="risk">
+                                <h4>Risk</h4>
+                                <span class="value">${entry.risk.value}</span>
+                            </div>
+                        </j:if>
                     </div>
 
                     <div class="body">
+
+                        <j:if test="${entry.hitsRiskThreshold}">
+                            <p class="hits-risk-threshold">This delta hit the configured risk threshold of ${entry.riskThreshold}.</p>
+                        </j:if>
 
                         <j:if test="${entry.showCommits}">
                             <h4>Commits</h4>
