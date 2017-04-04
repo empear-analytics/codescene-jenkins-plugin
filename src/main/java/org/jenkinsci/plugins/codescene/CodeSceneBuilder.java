@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
+    private static final int DEFAULT_RISK_THRESHOLD = 7;
 
     private final boolean analyzeLatestIndividually;
     private final boolean analyzeBranchDiff;
@@ -47,7 +48,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         this.analyzeBranchDiff = analyzeBranchDiff;
         this.baseRevision = baseRevision;
         this.markBuildAsUnstable = markBuildAsUnstable;
-        this.riskThreshold = riskThreshold;
+        this.riskThreshold = riskThreshold < 1 || riskThreshold > 10 ? DEFAULT_RISK_THRESHOLD : riskThreshold;
         this.username = username;
         this.password = password;
         this.deltaAnalysisUrl = deltaAnalysisUrl;
@@ -269,6 +270,14 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                                                   @QueryParameter String baseRevision) throws IOException, ServletException {
             if (analyzeBranchDiff && (baseRevision == null || baseRevision.isEmpty())) {
                 return FormValidation.error("Base revision cannot be empty.");
+            } else {
+                return FormValidation.ok();
+            }
+        }
+
+        public FormValidation doCheckRiskThreshold(@QueryParameter int riskThreshold, @QueryParameter boolean markBuildAsUnstable) {
+            if (markBuildAsUnstable && (riskThreshold < 1 || riskThreshold > 10)) {
+                return FormValidation.error("Risk threshold must be a number between 1 and 10. The value %d is invalid.", riskThreshold);
             } else {
                 return FormValidation.ok();
             }
