@@ -22,7 +22,7 @@ Make sure you have a [Jenkins-CI account](https://jenkins-ci.org/account) config
  </settings>
 ```
 
-You must have r/w permissions to [github.com/swehacker/codescene-jenkins-plugin](https://github.com/swehacker/codescene-jenkins-plugin) under the same username.
+You must have r/w permissions to [github.com/empear-analytics/codescene-jenkins-plugin](https://github.com/empear-analytics/codescene-jenkins-plugin) under the same username.
 
 ### Release
 
@@ -32,7 +32,7 @@ Run tests, check that all tests succeed locally.
 mvn test
 ```
 
-Check that the last build succeeded in [Travis CI](https://travis-ci.org/swehacker/codescene-jenkins-plugin).
+Check that the last build succeeded in [Travis CI](https://travis-ci.org/empear-analytics/codescene-jenkins-plugin).
 
 Ensure that the version in [pom.xml](pom.xml) is correct and ends with `-SNAPSHOT`.
 

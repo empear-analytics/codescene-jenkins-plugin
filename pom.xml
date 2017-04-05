@@ -37,7 +37,7 @@
     Delta Analysis to catch potential problems before they are delivered to
     your main branch.
     </description>
-    <url>https://github.com/swehacker/codescene-jenkins-plugin</url>
+    <url>https://github.com/empear-analytics/codescene-jenkins-plugin</url>
 
     <licenses>
         <license>
