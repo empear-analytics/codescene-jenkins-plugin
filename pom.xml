@@ -29,8 +29,13 @@
     </properties>
 
     <name>CodeScene Jenkins Plugin</name>
-    <description>A jenkins plugin for Empere's CodeScene, analising your code and identifying patterns in your code that
-        makes it harder to evolve in the future
+    <description>
+    CodeScene detects potential maintenance problems and early warnings in your
+    codebase. The earlier you can react to those findings, the better. That’s why
+    CodeScene offers integration points that let you incorporate the analysis
+    results into your build pipeline. This plugin lets you use CodeScene’s
+    Delta Analysis to catch potential problems before they are delivered to
+    your main branch.
     </description>
     <url>https://github.com/swehacker/codescene-jenkins-plugin</url>
 
@@ -43,9 +48,9 @@
 
     <developers>
         <developer>
-            <id>swehacker</id>
-            <name>Patrik Falk</name>
-            <email>patrik@patrikfalk.com</email>
+            <id>empear-analytics</id>
+            <name>Empear AB</name>
+            <email>info@empear.com</email>
         </developer>
     </developers>
 
