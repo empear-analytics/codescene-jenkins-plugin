@@ -1,6 +1,6 @@
 # codescene-jenkins-plugin
 
-[![Build Status](https://travis-ci.org/swehacker/codescene-jenkins-plugin.svg)](https://travis-ci.org/swehacker/codescene-jenkins-plugin)
+[![Build Status](https://travis-ci.org/empear-analytics/codescene-jenkins-plugin.svg)](https://travis-ci.org/empear-analytics/codescene-jenkins-plugin)
 
 A jenkins plugin for
 [CodeScene](http://www.empear.com/products/codescene-on-premise/) by Empear.
@@ -26,9 +26,9 @@ before they are delivered to your main branch.
 ## Contributing
 
 You're encouraged to submit [pull
-requests](https://github.com/swehacker/codescene-jenkins-plugin/pulls),
+requests](https://github.com/empear-analytics/codescene-jenkins-plugin/pulls),
 and to [propose features and discuss
-issues](https://github.com/swehacker/codescene-jenkins-plugin/issues).
+issues](https://github.com/empear-analytics/codescene-jenkins-plugin/issues).
 
 ## License
 
