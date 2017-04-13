@@ -1,6 +1,7 @@
 # codescene-jenkins-plugin
 
 [![Build Status](https://travis-ci.org/empear-analytics/codescene-jenkins-plugin.svg)](https://travis-ci.org/empear-analytics/codescene-jenkins-plugin)
+[![Latest release](https://img.shields.io/github/release/empear-analytics/codescene-jenkins-plugin.svg)](https://github.com/empear-analytics/codescene-jenkins-plugin/releases/latest)
 
 A jenkins plugin for
 [CodeScene](http://www.empear.com/products/codescene-on-premise/) by Empear.
