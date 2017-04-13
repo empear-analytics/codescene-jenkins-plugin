@@ -26,7 +26,9 @@ it.
 
 ## Changelog
 
-* 0.1.0
+* 1.0.1
+  - Add checksums to built artifacts in GitHub releases
+* 1.0.0
   - Delta analysis by branch, based on _base revision_
   - Delta analysis by individual commits (new commits not seen in previous jobs)
   - "Mark build as unstable" based on risk threshold

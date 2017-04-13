@@ -1,5 +1,12 @@
 # Releasing the CodeScene Jenkins Plugin
 
+## Changelog
+
+First, make sure [the CHANGELOG](README.md#changelog) is updated with the
+latest features and changes.
+
+## Version Tagging
+
 To create a release, first run:
 
 ``` bash
