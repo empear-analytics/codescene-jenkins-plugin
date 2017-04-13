@@ -19,8 +19,7 @@ before they are delivered to your main branch.
 ## Installation
 
 This plugin can be downloaded as an `.hpi` file from one the [published
-releases]
-(https://github.com/empear-analytics/codescene-jenkins-plugin/releases). Then,
+releases](https://github.com/empear-analytics/codescene-jenkins-plugin/releases). Then,
 in the Jenkins configuration UI for plugins, upload the `.hpi` file to install
 it.
 
