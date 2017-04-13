@@ -3,6 +3,10 @@ language: java
 jdk:
 - oraclejdk8
 
+cache:
+  directories:
+    - $HOME/.m2
+
 script: mvn compile findbugs:check package verify
 
 deploy:
