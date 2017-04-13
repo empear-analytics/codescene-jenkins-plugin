@@ -82,11 +82,11 @@
         </dependency>
     </dependencies>
 
-    <!--scm>
-      <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
-      <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
-      <url>http://github.com/jenkinsci/${project.artifactId}-plugin</url>
-    </scm-->
+    <scm>
+      <connection>scm:git:git://github.com/empear-analytics/codescene-jenkins-plugin.git</connection>
+      <developerConnection>scm:git:git@github.com:empear-analytics/codescene-jenkins-plugin.git</developerConnection>
+      <url>http://github.com/empear-analytics/codescene-jenkins-plugin</url>
+    </scm>
 
     <repositories>
         <repository>
