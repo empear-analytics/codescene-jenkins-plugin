@@ -3,7 +3,7 @@ language: java
 jdk:
 - oraclejdk8
 
-script: mvn compile findbugs:check package
+script: mvn compile findbugs:check package verify
 
 deploy:
   provider: releases

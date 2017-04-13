@@ -1,88 +1,20 @@
-Releasing CodeScene Plugin
-===================
+# Releasing the CodeScene Jenkins Plugin
 
-There're no particular rules about when to release. Release bug fixes frequently, features not so frequently and breaking API changes rarely.
+To create a release, first run:
 
-### Access
-
-Make sure you have a [Jenkins-CI account](https://jenkins-ci.org/account) configured in `~/.m2/settings.xml`. You can get the encrypted password from [here](https://repo.jenkins-ci.org/webapp/#/profile) - enter your password and click `Unlock`.
-
-```xml
-<settings>
-  <pluginGroups>
-    <pluginGroup>org.jenkins-ci.tools</pluginGroup>
-  </pluginGroups>
-  <servers>
-    <server>
-      <id>repo.jenkins-ci.org</id>
-      <username>...</username>
-      <password>...</password>
-    </server>
-  </servers>
- </settings>
+``` bash
+mvn release:prepare
 ```
 
-You must have r/w permissions to [github.com/empear-analytics/codescene-jenkins-plugin](https://github.com/empear-analytics/codescene-jenkins-plugin) under the same username.
+This will prompt you for a release version label, e.g. `1.2.3`. Then it prompts
+you for the git tag, which in this scenario should be `v1.2.3`. Finally, you
+should set the coming SNAPSHOT version to, in this scenario, `1.2.4-SNAPSHOT`.
 
-### Release
+The release plugin will create a tag in git and push the changes to GitHub,
+triggering a Travis build.
 
-Run tests, check that all tests succeed locally.
-
-```
-mvn test
-```
-
-Check that the last build succeeded in [Travis CI](https://travis-ci.org/empear-analytics/codescene-jenkins-plugin).
-
-Ensure that the version in [pom.xml](pom.xml) is correct and ends with `-SNAPSHOT`.
-
-``` xml
-<artifactId>ansicolor</artifactId>
-<packaging>hpi</packaging>
-<version>0.4.1-SNAPSHOT</version>
-```
-
-*  Increment the third number if the release has bug fixes and/or very minor features, only (eg. change `0.4.1` to `0.4.2`).
-*  Increment the second number if the release contains major features or breaking API changes (eg. change `0.4.1` to `0.5.0`).
-
-Change "Next Release" in [CHANGELOG.md](CHANGELOG.md) to the new version.
-
-```
-0.4.1 (12/11/2014)
-=================
-```
-
-Remove the line with "Your contribution here.", since there will be no more contributions to this release.
-
-Commit your changes.
-
-```
-git add CHANGELOG.md
-git commit -m "Preparing for release, 0.4.1."
-git push origin master
-```
-
-Make a release.
-
-```
-$ mvn release:prepare release:perform
-```
-
-### Prepare for the Next Version
-
-Add the next release to [CHANGELOG.md](CHANGELOG.md).
-
-```
-Next Release
-============
-
-* Your contribution here.
-```
-
-Commit your changes.
-
-```
-git add CHANGELOG.md
-git commit -m "Preparing for next development iteration."
-git push origin master
-```
+Do **NOT** run `mvn release:perform`, just sit back and watch the Travis build
+pass, and your tagged release should eventually appear as a [GitHub
+Release](https://github.com/empear-analytics/codescene-jenkins-plugin/releases).
+The `.hpi` file is automatically added to the release, available for users to
+download and then upload in Jenkins.
