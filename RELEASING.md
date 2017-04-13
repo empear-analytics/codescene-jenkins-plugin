@@ -3,7 +3,7 @@
 To create a release, first run:
 
 ``` bash
-mvn release:prepare
+mvn release:prepare -Dresume=false
 ```
 
 This will prompt you for a release version label, e.g. `1.2.3`. Then it prompts
