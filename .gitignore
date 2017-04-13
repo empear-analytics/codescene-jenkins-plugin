@@ -1,5 +1,7 @@
 *.class
 work/
+/release.properties
+/pom.xml.releaseBackup
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
