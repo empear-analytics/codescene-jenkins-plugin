@@ -2,8 +2,10 @@ package org.jenkinsci.plugins.codescene.Domain;
 
 import org.apache.commons.codec.binary.Base64;
 
-public class CodeSceneUser {
+import java.nio.charset.Charset;
 
+public class CodeSceneUser {
+    private static final Charset UTF8 = Charset.forName("UTF8");
     private final String name;
     private final String password;
 
@@ -29,8 +31,7 @@ public class CodeSceneUser {
     }
 
     public String asBase64Encoded() {
-        final byte[] bs = (name + ":" + password).getBytes();
+        final byte[] bs = (name + ":" + password).getBytes(UTF8);
 
-        return new String(Base64.encodeBase64(bs));
-    }
+        return new String(Base64.encodeBase64(bs), UTF8); }
 }

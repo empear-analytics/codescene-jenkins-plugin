@@ -112,10 +112,10 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         ArrayList<CodeSceneBuildActionEntry> entries = new ArrayList<>(commitSets.size());
 
         if (!commitSets.isEmpty()) {
-            listener.getLogger().format("Starting delta analysis on %d commit(s)...\n", commitSets.size());
+            listener.getLogger().format("Starting delta analysis on %d commit(s)...%n", commitSets.size());
             for (Commits commits : commitSets) {
                 DeltaAnalysis deltaAnalysis = new DeltaAnalysis(config);
-                listener.getLogger().format("Running delta analysis on commits (%s) in repository %s.\n", commits.value(), config.gitRepisitoryToAnalyze().value());
+                listener.getLogger().format("Running delta analysis on commits (%s) in repository %s.%n", commits.value(), config.gitRepisitoryToAnalyze().value());
                 DeltaAnalysisResult result = deltaAnalysis.runOn(commits);
 
                 URL detailsUrl = new URL(
@@ -134,7 +134,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                         riskThreshold));
             }
         } else {
-            listener.getLogger().format("No commits to run delta analysis on.\n");
+            listener.getLogger().format("No commits to run delta analysis on.%n");
         }
 
         return entries;
@@ -143,7 +143,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     private CodeSceneBuildActionEntry runDeltaAnalysisOnBranchDiff(Configuration config, List<String> revisions, String branchName, TaskListener listener) throws MalformedURLException {
         Commits commitSet = revisionsAsCommitSet(revisions);
         DeltaAnalysis deltaAnalysis = new DeltaAnalysis(config);
-        listener.getLogger().format("Running delta analysis on branch %s in repository %s.\n", branchName, config.gitRepisitoryToAnalyze().value());
+        listener.getLogger().format("Running delta analysis on branch %s in repository %s.%n", branchName, config.gitRepisitoryToAnalyze().value());
         DeltaAnalysisResult result = deltaAnalysis.runOn(commitSet);
 
         URL detailsUrl = new URL(
@@ -204,11 +204,12 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
             listener.error("%s hits the risk threshold (%d). Marking build as unstable.", link, threshold);
             Result newResult = Result.UNSTABLE;
 
-            Result result = build.getResult() != null
-                    ? build.getResult().combine(newResult)
-                    : newResult;
-
-            build.setResult(result);
+            Result result = build.getResult();
+            if (result != null) {
+                build.setResult(result.combine(newResult));
+            } else {
+                build.setResult(newResult);
+            }
         }
     }
 
@@ -229,7 +230,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                 .join();
 
         ArrayList<String> revisions = new ArrayList<>();
-        for (String line : out.toString().split("\n")) {
+        for (String line : out.toString("UTF8").split("\n")) {
             String trimmed = line.trim();
             if (!trimmed.isEmpty()) {
                 revisions.add(trimmed);
