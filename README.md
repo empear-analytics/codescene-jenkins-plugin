@@ -50,6 +50,13 @@ The CodeScene API configuration section has to match the information specified i
 
 ## Changelog
 
+* 1.1.0
+  - Only required parameters are now set in constructor.
+    Optional parameters are set with setters.
+    Check https://github.com/jenkinsci/pipeline-plugin/blob/c84a9af/DEVGUIDE.md#constructor-vs-setters.
+    **Original constructor has been removed**!
+
+
 * 1.0.1
   - Add checksums to built artifacts in GitHub releases
 * 1.0.0

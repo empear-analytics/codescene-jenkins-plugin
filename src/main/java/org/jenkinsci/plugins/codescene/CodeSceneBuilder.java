@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.codescene;
 
+import static java.util.Collections.singletonList;
+
 import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
@@ -15,6 +17,7 @@ import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.codescene.Domain.*;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -24,31 +27,27 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     private static final int DEFAULT_RISK_THRESHOLD = 7;
 
-    private final boolean analyzeLatestIndividually;
-    private final boolean analyzeBranchDiff;
-    private final String baseRevision;
-
-    private final boolean markBuildAsUnstable;
-    private final int riskThreshold;
-
+    // required params
     private final String username;
     private final String password;
     private final String deltaAnalysisUrl;
     private final String repository;
 
+    // optional params
+    private boolean analyzeLatestIndividually;
+    private boolean analyzeBranchDiff;
+    private String baseRevision;
+    private boolean markBuildAsUnstable;
+    private int riskThreshold = DEFAULT_RISK_THRESHOLD;
+
+
     @DataBoundConstructor
-    public CodeSceneBuilder(boolean analyzeLatestIndividually, boolean analyzeBranchDiff, String baseRevision, boolean markBuildAsUnstable, int riskThreshold, String username, String password, String deltaAnalysisUrl, String repository) {
-        this.analyzeLatestIndividually = analyzeLatestIndividually;
-        this.analyzeBranchDiff = analyzeBranchDiff;
-        this.baseRevision = baseRevision;
-        this.markBuildAsUnstable = markBuildAsUnstable;
-        this.riskThreshold = riskThreshold < 1 || riskThreshold > 10 ? DEFAULT_RISK_THRESHOLD : riskThreshold;
+    public CodeSceneBuilder(String username, String password, String deltaAnalysisUrl, String repository) {
         this.username = username;
         this.password = password;
         this.deltaAnalysisUrl = deltaAnalysisUrl;
@@ -89,6 +88,31 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
 
     public String getRepository() {
         return repository;
+    }
+
+    @DataBoundSetter
+    public void setAnalyzeLatestIndividually(boolean analyzeLatestIndividually) {
+        this.analyzeLatestIndividually = analyzeLatestIndividually;
+    }
+
+    @DataBoundSetter
+    public void setAnalyzeBranchDiff(boolean analyzeBranchDiff) {
+        this.analyzeBranchDiff = analyzeBranchDiff;
+    }
+
+    @DataBoundSetter
+    public void setBaseRevision(String baseRevision) {
+        this.baseRevision = baseRevision;
+    }
+
+    @DataBoundSetter
+    public void setMarkBuildAsUnstable(boolean markBuildAsUnstable) {
+        this.markBuildAsUnstable = markBuildAsUnstable;
+    }
+
+    @DataBoundSetter
+    public void setRiskThreshold(int riskThreshold) {
+        this.riskThreshold = riskThreshold < 1 || riskThreshold > 10 ? DEFAULT_RISK_THRESHOLD : riskThreshold;
     }
 
     private Commits revisionsAsCommitSet(List<String> revisions) {
@@ -186,13 +210,10 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                 List<String> revisions = getCommitRange(build, workspace, launcher, listener, getBaseRevision(), currentCommit);
                 CodeSceneBuildActionEntry entry = runDeltaAnalysisOnBranchDiff(codesceneConfig, revisions, branch, listener);
                 markAsUnstableWhenAtRiskThreshold(riskThreshold, entry, build, listener);
-                build.addAction(new CodeSceneBuildAction("Delta - By Branch", Arrays.asList(entry)));
+                build.addAction(new CodeSceneBuildAction("Delta - By Branch", singletonList(entry)));
             }
 
-        } catch (InterruptedException e) {
-            listener.error("Failed to run delta analysis: %s", e);
-            build.setResult(Result.FAILURE);
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             listener.error("Failed to run delta analysis: %s", e);
             build.setResult(Result.FAILURE);
         }
