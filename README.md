@@ -55,6 +55,10 @@ The CodeScene API configuration section has to match the information specified i
     Optional parameters are set with setters.
     Check https://github.com/jenkinsci/pipeline-plugin/blob/c84a9af/DEVGUIDE.md#constructor-vs-setters.
     **Original constructor has been removed**!
+  - Specify mnemonic extension name "codescene" via `@Symbol` in `CodeSceneBuilder`.
+    Check https://github.com/jenkinsci/pipeline-plugin/blob/c84a9af/DEVGUIDE.md#defining-symbols
+    and https://wiki.jenkins-ci.org/display/JENKINS/Structs+plugin for more details.
+
 
 
 * 1.0.1

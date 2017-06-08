@@ -74,6 +74,13 @@
             <artifactId>commons-codec</artifactId>
             <version>20041127.091804</version>
         </dependency>
+        <!-- https://wiki.jenkins-ci.org/display/JENKINS/Structs+plugin
+        for easier usage of plugin in DSL. Using @Symbol annotation to name our extension -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>structs</artifactId>
+            <version>1.7</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -15,6 +15,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.util.FormValidation;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.codescene.Domain.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -260,6 +261,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         return revisions;
     }
 
+    @Symbol("codescene")
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
         public DescriptorImpl() {
