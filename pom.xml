@@ -27,7 +27,7 @@
         -->
     </properties>
 
-    <name>CodeScene Jenkins Plugin</name>
+    <name>CodeScene Plugin</name>
     <description>
     CodeScene detects potential maintenance problems and early warnings in your
     codebase. The earlier you can react to those findings, the better. That’s why
