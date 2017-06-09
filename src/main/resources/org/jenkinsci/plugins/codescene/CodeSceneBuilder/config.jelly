@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
 
     <f:section title="Delta Analysis Settings">
 
@@ -21,13 +21,10 @@
     </f:section>
 
     <f:section title="CodeScene API Configuration">
-        <f:entry title="Bot User">
-            <f:textbox field="username" value="${it.username}" />
+        <f:entry field="credentialsId" title="${%Credentials}" value="${it.credentialsId}">
+            <c:select/>
         </f:entry>
-        <f:entry title="Bot Password">
-            <f:password field="password" value="${it.password}"/>
-        </f:entry>
-        <f:entry title="Project Delta Analysis URL">
+        <f:entry title="Project Delta Analysis URL" description="E.g. http://localhost:3003/projects/2/delta-analysis">
             <f:textbox field="deltaAnalysisUrl" value="${it.deltaAnalysisUrl}"/>
         </f:entry>
         <f:entry title="Repository">

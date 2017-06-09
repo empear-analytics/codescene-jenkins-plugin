@@ -74,6 +74,7 @@
             <artifactId>commons-codec</artifactId>
             <version>20041127.091804</version>
         </dependency>
+
         <!-- https://wiki.jenkins-ci.org/display/JENKINS/Structs+plugin
         for easier usage of plugin in DSL. Using @Symbol annotation to name our extension -->
         <dependency>
@@ -81,6 +82,19 @@
             <artifactId>structs</artifactId>
             <version>1.7</version>
         </dependency>
+
+        <!--Credentials plugins to handle CodeScene credentials in a safe manner-->
+         <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>credentials</artifactId>
+            <version>2.1.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>plain-credentials</artifactId>
+            <version>1.4</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

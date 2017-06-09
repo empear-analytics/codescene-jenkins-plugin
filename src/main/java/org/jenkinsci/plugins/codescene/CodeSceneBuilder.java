@@ -2,21 +2,35 @@ package org.jenkinsci.plugins.codescene;
 
 import static java.util.Collections.singletonList;
 
+import com.cloudbees.plugins.credentials.CredentialsMatcher;
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
+import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.console.HyperlinkNote;
+import hudson.model.Item;
+import hudson.model.Queue;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.model.queue.Tasks;
+import hudson.security.ACL;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.codescene.Domain.*;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -28,14 +42,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     private static final int DEFAULT_RISK_THRESHOLD = 7;
 
     // required params
-    private final String username;
-    private final String password;
+    private final String credentialsId;
     private final String deltaAnalysisUrl;
     private final String repository;
 
@@ -46,11 +60,15 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     private boolean markBuildAsUnstable;
     private int riskThreshold = DEFAULT_RISK_THRESHOLD;
 
+    // deprecated authentication params - use credentialsId instead
+    @Deprecated private transient String username;
+    @Deprecated private transient String password;
+
+
 
     @DataBoundConstructor
-    public CodeSceneBuilder(String username, String password, String deltaAnalysisUrl, String repository) {
-        this.username = username;
-        this.password = password;
+    public CodeSceneBuilder(String credentialsId, String deltaAnalysisUrl, String repository) {
+        this.credentialsId = credentialsId;
         this.deltaAnalysisUrl = deltaAnalysisUrl;
         this.repository = repository;
     }
@@ -75,12 +93,8 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         return riskThreshold;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
+    public String getCredentialsId() {
+        return credentialsId;
     }
 
     public String getDeltaAnalysisUrl() {
@@ -188,7 +202,8 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
 
         try {
             URL url = new URL(deltaAnalysisUrl);
-            Configuration codesceneConfig = new Configuration(url, new CodeSceneUser(username, password), new Repository(repository));
+
+            Configuration codesceneConfig = new Configuration(url, userConfig(), new Repository(repository));
             EnvVars env = build.getEnvironment(listener);
 
             String previousCommit = env.get("GIT_PREVIOUS_SUCCESSFUL_COMMIT");
@@ -218,6 +233,27 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
             listener.error("Failed to run delta analysis: %s", e);
             build.setResult(Result.FAILURE);
         }
+    }
+
+    private CodeSceneUser userConfig() {
+        if (credentialsId == null) {
+            // fallback to the deprecated username and password due the backward compatibility.
+            return new CodeSceneUser(username, password);
+        }
+
+        final UsernamePasswordCredentials credentials = lookupCredentials(credentialsId);
+        if (credentials == null) {
+            throw new IllegalStateException("No CodeScene credentials found for id=" + credentialsId);
+        }
+        return new CodeSceneUser(credentials.getUsername(), credentials.getPassword().getPlainText());
+    }
+
+
+    private UsernamePasswordCredentials lookupCredentials(String credentialId) {
+        List<UsernamePasswordCredentials> credentials = CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class,
+                Jenkins.getInstance(), ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
+        CredentialsMatcher matcher = CredentialsMatchers.withId(credentialId);
+        return CredentialsMatchers.firstOrNull(credentials, matcher);
     }
 
     private void markAsUnstableWhenAtRiskThreshold(int threshold, CodeSceneBuildActionEntry entry, Run<?, ?> build, TaskListener listener) throws IOException {
@@ -307,17 +343,9 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
             }
         }
 
-        public FormValidation doCheckUsername(@QueryParameter String username) {
-            if (username == null || username.isEmpty()) {
-                return FormValidation.error("CodeScene bot user name cannot be blank.");
-            } else {
-                return FormValidation.ok();
-            }
-        }
-
-        public FormValidation doCheckPassword(@QueryParameter String password) {
-            if (password == null || password.isEmpty()) {
-                return FormValidation.error("CodeScene bot password cannot be blank.");
+        public FormValidation doCheckCredentialsId(@QueryParameter String credentialsId) {
+            if (credentialsId == null || credentialsId.isEmpty()) {
+                return FormValidation.error("CodeScene API credentials must be set.");
             } else {
                 return FormValidation.ok();
             }
@@ -343,6 +371,27 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                 return FormValidation.ok();
             }
         }
+
+        /**
+         * Populates the list of credentials in the select box in CodeScene API configuration section
+         * Inspired by git plugin:
+         * https://github.com/jenkinsci/git-plugin/blob/f58648e9005293ab07b2389212603ff9a460b80a/src/main/java/jenkins/plugins/git/GitSCMSource.java#L239
+         */
+        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Jenkins context, @QueryParameter String credentialsId) {
+            if (context == null || !context.hasPermission(Item.CONFIGURE)) {
+                return new StandardListBoxModel().includeCurrentValue(credentialsId);
+            }
+            return new StandardListBoxModel()
+                    .includeEmptyValue()
+                    .includeMatchingAs(
+                            context instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task)context) : ACL.SYSTEM,
+                            context,
+                            StandardUsernameCredentials.class,
+                            Collections.<DomainRequirement>emptyList(),
+                            CredentialsMatchers.always())
+                    .includeCurrentValue(credentialsId);
+        }
+
     }
 }
 
