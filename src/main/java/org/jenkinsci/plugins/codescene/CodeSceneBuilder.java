@@ -73,11 +73,11 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         this.repository = repository;
     }
 
-    public boolean getAnalyzeLatestIndividually() {
+    public boolean isAnalyzeLatestIndividually() {
         return analyzeLatestIndividually;
     }
 
-    public boolean getAnalyzeBranchDiff() {
+    public boolean isAnalyzeBranchDiff() {
         return analyzeBranchDiff;
     }
 
@@ -85,7 +85,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         return baseRevision;
     }
 
-    public boolean getMarkBuildAsUnstable() {
+    public boolean isMarkBuildAsUnstable() {
         return markBuildAsUnstable;
     }
 
@@ -196,7 +196,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) {
-        if (!getAnalyzeLatestIndividually() && !getAnalyzeBranchDiff()) {
+        if (!isAnalyzeLatestIndividually() && !isAnalyzeBranchDiff()) {
             return;
         }
 
@@ -210,7 +210,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
             String currentCommit = env.get("GIT_COMMIT");
             String branch = env.get("GIT_BRANCH");
 
-            if (getAnalyzeLatestIndividually() && previousCommit != null) {
+            if (isAnalyzeLatestIndividually() && previousCommit != null) {
                 List<String> revisions = getCommitRange(build, workspace, launcher, listener, previousCommit, currentCommit);
                 if (revisions.isEmpty()) {
                     listener.getLogger().println("No new commits to analyze individually for this build.");
@@ -222,7 +222,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                     build.addAction(new CodeSceneBuildAction("Delta - Individual Commits", entries));
                 }
             }
-            if (getAnalyzeBranchDiff() && getBaseRevision() != null) {
+            if (isAnalyzeBranchDiff() && getBaseRevision() != null) {
                 List<String> revisions = getCommitRange(build, workspace, launcher, listener, getBaseRevision(), currentCommit);
                 CodeSceneBuildActionEntry entry = runDeltaAnalysisOnBranchDiff(codesceneConfig, revisions, branch, listener);
                 markAsUnstableWhenAtRiskThreshold(riskThreshold, entry, build, listener);
@@ -257,7 +257,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     }
 
     private void markAsUnstableWhenAtRiskThreshold(int threshold, CodeSceneBuildActionEntry entry, Run<?, ?> build, TaskListener listener) throws IOException {
-        if (getMarkBuildAsUnstable() && entry.getHitsRiskThreshold()) {
+        if (isMarkBuildAsUnstable() && entry.getHitsRiskThreshold()) {
             String link = HyperlinkNote.encodeTo(entry.getViewUrl().toExternalForm(), String.format("Delta analysis result with risk %d", entry.getRisk().getValue()));
             listener.error("%s hits the risk threshold (%d). Marking build as unstable.", link, threshold);
             Result newResult = Result.UNSTABLE;
