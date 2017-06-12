@@ -15,7 +15,7 @@
 
         <f:optionalBlock field="markBuildAsUnstable" title="Mark as Unstable on High Risk" inline="true">
             <f:entry title="Risk Threshold">
-                <f:number field="riskThreshold" value="${it.riskThreshold}" min="1" max="10" />
+                <f:number field="riskThreshold" default="7" value="${it.riskThreshold}" min="1" max="10" />
             </f:entry>
         </f:optionalBlock>
     </f:section>
