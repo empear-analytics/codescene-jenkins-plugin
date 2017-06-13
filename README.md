@@ -17,14 +17,13 @@ before they are delivered to your main branch.
 
 ![Screenshot](screenshot.png)
 
-In addition to the risk classification, CodeScene also runs its set of early warning analyses
-as shown in the following figure:
+In addition to the risk classification, CodeScene also runs its set of early warning analyses:
 
 ![EarlyWarning](earlywarning.png)
 
 The early warnings and risk classification let you prioritize your code reviews and
 focus your time where (and when) it’s likely to be needed the most.
-Code reviewer fatique is a real thing, so let’s use our review efforts wisely.
+Code reviewer fatigue is a real thing, so let’s use our review efforts wisely.
 
 ## Installation
 
@@ -37,7 +36,9 @@ it.
 
 Enable the CodeScene integration by adding a new build step in your Jenkins configuration. Select the option *Run CodeScene Delta Analysis*.
 
-Enter the required information in the CodeScene Jenkins configuration as show in the following figure:
+![Add Buildstep](add-buildstep.png)
+
+Enter the required information in the CodeScene Jenkins configuration:
 
 ![Buildstep](buildstep.png)
 
@@ -48,7 +49,27 @@ CodeScene gives you a number of options that controls the scope of the delta ana
 
 The CodeScene API configuration section has to match the information specified inside CodeScene itself and retrievable from the analysis configuration.
 
+API Credentials should be added via [jenkins credentials plugin](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin).
+Check [Injecting Secrets into Jenkins Build Jobs](https://support.cloudbees.com/hc/en-us/articles/203802500-Injecting-Secrets-into-Jenkins-Build-Jobs) for more details.
+
 ## Changelog
+
+* 1.1.0
+  - Use [credentials plugin](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin)
+    for storing CodeScene API credentials instead of hardcoded username and password.
+    Existing jobs will continue to work, but you won't be able to update job configuration
+    (e.g. change username or password) until you switch to the credentials plugin.
+    Check [Injecting Secrets into Jenkins Build Jobs](https://support.cloudbees.com/hc/en-us/articles/203802500-Injecting-Secrets-into-Jenkins-Build-Jobs)
+    for more details.
+  - Only required parameters are now set in constructor.
+    Optional parameters are set with setters.
+    Check https://github.com/jenkinsci/pipeline-plugin/blob/c84a9af/DEVGUIDE.md#constructor-vs-setters.
+    **Original constructor has been removed**!
+  - Specify mnemonic extension name "codescene" via `@Symbol` in `CodeSceneBuilder`.
+    Check https://github.com/jenkinsci/pipeline-plugin/blob/c84a9af/DEVGUIDE.md#defining-symbols
+    and https://wiki.jenkins-ci.org/display/JENKINS/Structs+plugin for more details.
+
+
 
 * 1.0.1
   - Add checksums to built artifacts in GitHub releases
