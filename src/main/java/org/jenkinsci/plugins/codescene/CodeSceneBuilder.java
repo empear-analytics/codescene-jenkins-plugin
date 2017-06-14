@@ -226,7 +226,8 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         try {
             URL url = new URL(deltaAnalysisUrl);
 
-            Configuration codesceneConfig = new Configuration(url, userConfig(), new Repository(repository));
+            Configuration codesceneConfig = new Configuration(url, userConfig(), new Repository(repository),
+                    couplingThresholdPercent);
             EnvVars env = build.getEnvironment(listener);
 
             String previousCommit = env.get("GIT_PREVIOUS_SUCCESSFUL_COMMIT");

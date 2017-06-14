@@ -7,11 +7,14 @@ public class Configuration {
     private final URL url;
     private final CodeSceneUser user;
     private final Repository repo;
+    private final int couplingThresholdPercent;
 
-    public Configuration(final URL codeSceneUrl, final CodeSceneUser user, final Repository gitRepositoryToAnalyze) {
-        url = codeSceneUrl;
+    public Configuration(final URL codeSceneUrl, final CodeSceneUser user, final Repository gitRepositoryToAnalyze,
+                         int couplingThresholdPercent) {
+        this.url = codeSceneUrl;
         this.user = user;
-        repo = gitRepositoryToAnalyze;
+        this.repo = gitRepositoryToAnalyze;
+        this.couplingThresholdPercent = couplingThresholdPercent;
     }
 
     public URL codeSceneUrl() {
@@ -24,5 +27,9 @@ public class Configuration {
 
     public Repository gitRepisitoryToAnalyze() {
         return repo;
+    }
+
+    public int couplingThresholdPercent() {
+        return couplingThresholdPercent;
     }
 }
