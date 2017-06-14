@@ -47,6 +47,8 @@ import java.util.List;
 
 public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     private static final int DEFAULT_RISK_THRESHOLD = 7;
+    // default is the same as in codescene rest api and shouldn't be changed
+    private static final int DEFAULT_COUPLING_THRESHOLD_PERCENT = 80;
 
     // required params
     private final String credentialsId;
@@ -59,6 +61,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     private String baseRevision;
     private boolean markBuildAsUnstable;
     private int riskThreshold = DEFAULT_RISK_THRESHOLD;
+    private int couplingThresholdPercent = DEFAULT_COUPLING_THRESHOLD_PERCENT;
 
     // deprecated authentication params - use credentialsId instead
     @Deprecated private transient String username;
@@ -105,6 +108,10 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         return repository;
     }
 
+    public int getCouplingThresholdPercent() {
+        return couplingThresholdPercent;
+    }
+
     @DataBoundSetter
     public void setAnalyzeLatestIndividually(boolean analyzeLatestIndividually) {
         this.analyzeLatestIndividually = analyzeLatestIndividually;
@@ -128,6 +135,22 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     @DataBoundSetter
     public void setRiskThreshold(int riskThreshold) {
         this.riskThreshold = riskThreshold < 1 || riskThreshold > 10 ? DEFAULT_RISK_THRESHOLD : riskThreshold;
+    }
+
+    @DataBoundSetter
+    public void setCouplingThresholdPercent(int couplingThresholdPercent) {
+        this.couplingThresholdPercent = couplingThresholdPercent < 1 || couplingThresholdPercent > 100
+                ? DEFAULT_COUPLING_THRESHOLD_PERCENT
+                : couplingThresholdPercent;
+    }
+
+    // handle default values for new fields with regards to existing jobs (backward compatibility)
+    // check https://wiki.jenkins-ci.org/display/JENKINS/Hint+on+retaining+backward+compatibility
+    protected Object readResolve() {
+        if (couplingThresholdPercent == 0) {
+            couplingThresholdPercent = DEFAULT_COUPLING_THRESHOLD_PERCENT;
+        }
+        return this;
     }
 
     private Commits revisionsAsCommitSet(List<String> revisions) {
@@ -371,6 +394,16 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                 return FormValidation.ok();
             }
         }
+
+        public FormValidation doCheckCouplingThresholdPercent(@QueryParameter int couplingThresholdPercent) {
+            if (couplingThresholdPercent < 1 || couplingThresholdPercent > 100) {
+                return FormValidation.error("Temporal coupling threshold is percentage and must be a number between 1 and 100." +
+                        "The value %d is invalid.", couplingThresholdPercent);
+            } else {
+                return FormValidation.ok();
+            }
+        }
+
 
         /**
          * Populates the list of credentials in the select box in CodeScene API configuration section
