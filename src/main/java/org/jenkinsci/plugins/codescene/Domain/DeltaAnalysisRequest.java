@@ -7,12 +7,13 @@ public class DeltaAnalysisRequest {
 
     private final JsonObject value;
 
-    public DeltaAnalysisRequest(final Commits commits, final Repository gitRepository) {
+    public DeltaAnalysisRequest(final Commits commits, final Repository gitRepository, final int couplingThresholdPercent) {
         final JsonArray cs = serialize(commits);
 
         JsonObjectBuilder b = Json.createObjectBuilder();
         b.add("commits", cs);
         b.add("repository", gitRepository.value());
+        b.add("coupling_threshold_percent", couplingThresholdPercent);
 
         value = b.build();
     }
