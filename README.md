@@ -47,6 +47,11 @@ CodeScene gives you a number of options that controls the scope of the delta ana
 * *Individual Commits*: Check this option to run a delta analysis on each individual commit. When in doubt, make this your default setting.
 * *By Branch*: With this option, CodeScene runs a delta analysis on the difference between the branch you build and the one you provide as reference. Use this option if you want to analyse a whole pull request.
 
+You can also change the defaults for risk threshold and temporal coupling threshold
+
+* *Risk Threshold*: commits with risk equal or higher than this value will make a build unstable
+* *Temporal Coupling Threshold*: minimum temporal coupling for "Absence of Expected Change Pattern" warning
+
 The CodeScene API configuration section has to match the information specified inside CodeScene itself and retrievable from the analysis configuration.
 
 API Credentials should be added via [jenkins credentials plugin](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin).
