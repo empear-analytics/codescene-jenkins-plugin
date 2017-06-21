@@ -1,3 +1,5 @@
+# THIS REPOSITORY HAS BEEN DEPRECATED: please use https://github.com/jenkinsci/codescene-plugin
+
 # codescene-jenkins-plugin
 
 [![Build Status](https://travis-ci.org/empear-analytics/codescene-jenkins-plugin.svg)](https://travis-ci.org/empear-analytics/codescene-jenkins-plugin)
