@@ -19,4 +19,4 @@ deploy:
     - target/codescene.hpi.sha1
   on:
     tags: true
-    repo: empear-analytics/codescene-jenkins-plugin
+    repo: jenkinsci/codescene-plugin
