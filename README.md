@@ -60,30 +60,26 @@ Check [Injecting Secrets into Jenkins Build Jobs](https://support.cloudbees.com/
 ## Changelog
 
 * 1.1.0
-  - Add new configuration field for temporal coupling threshold. The new field is set to 80 percent by default.
-    Requires CodeScene 2.0+, otherwise the new settings doesn't have any effect.   
-  - Use [credentials plugin](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin)
+  * Use [credentials plugin](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin)
     for storing CodeScene API credentials instead of hardcoded username and password.
     Existing jobs will continue to work, but you won't be able to update job configuration
     (e.g. change username or password) until you switch to the credentials plugin.
     Check [Injecting Secrets into Jenkins Build Jobs](https://support.cloudbees.com/hc/en-us/articles/203802500-Injecting-Secrets-into-Jenkins-Build-Jobs)
     for more details.
-  - Only required parameters are now set in constructor.
+  * Only required parameters are now set in constructor.
     Optional parameters are set with setters.
     Check https://github.com/jenkinsci/pipeline-plugin/blob/c84a9af/DEVGUIDE.md#constructor-vs-setters.
     **Original constructor has been removed**!
-  - Specify mnemonic extension name "codescene" via `@Symbol` in `CodeSceneBuilder`.
+  * Specify mnemonic extension name "codescene" via `@Symbol` in `CodeSceneBuilder`.
     Check https://github.com/jenkinsci/pipeline-plugin/blob/c84a9af/DEVGUIDE.md#defining-symbols
     and https://wiki.jenkins-ci.org/display/JENKINS/Structs+plugin for more details.
-
-
-
+  * Add new configuration field for temporal coupling threshold. The new field is set to 80 percent by default. Requires CodeScene 2.0+, otherwise the new settings doesn't have any effect.
 * 1.0.1
-  - Add checksums to built artifacts in GitHub releases
+  * Add checksums to built artifacts in GitHub releases
 * 1.0.0
-  - Delta analysis by branch, based on _base revision_
-  - Delta analysis by individual commits (new commits not seen in previous jobs)
-  - "Mark build as unstable" based on risk threshold
+  * Delta analysis by branch, based on _base revision_
+  * Delta analysis by individual commits (new commits not seen in previous jobs)
+  * "Mark build as unstable" based on risk threshold
 
 ## Contributing
 
