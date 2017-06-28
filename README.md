@@ -60,6 +60,8 @@ Check [Injecting Secrets into Jenkins Build Jobs](https://support.cloudbees.com/
 ## Changelog
 
 * 1.1.0
+  - Add new configuration field for temporal coupling threshold. The new field is set to 80 percent by default.
+    Requires CodeScene 2.0+, otherwise the new settings doesn't have any effect.   
   - Use [credentials plugin](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin)
     for storing CodeScene API credentials instead of hardcoded username and password.
     Existing jobs will continue to work, but you won't be able to update job configuration
