@@ -27,10 +27,12 @@ Code reviewer fatigue is a real thing, so let’s use our review efforts wisely.
 
 ## Installation
 
-This plugin can be downloaded as an `.hpi` file from one the [published
-releases](https://github.com/empear-analytics/codescene-jenkins-plugin/releases). Then,
-in the Jenkins configuration UI for plugins, upload the `.hpi` file to install
-it.
+The recommended way is to install the plugin via Jenkins Update Center (Jenkins -> Manage Jenkins -> Manage Plugins). You can find the latest version in [Jenkins plugin repository](https://plugins.jenkins.io/codescene).
+
+### Manual build and installation
+
+You can build the latest version of plugin by running `mvn clean package` and installing `target/codescene.hpi`
+to your Jenkins manually.
 
 ### Configure Jenkins for CodeScene
 
