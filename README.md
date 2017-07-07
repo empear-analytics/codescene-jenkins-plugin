@@ -61,6 +61,8 @@ Check [Injecting Secrets into Jenkins Build Jobs](https://support.cloudbees.com/
 
 ## Changelog
 
+* 1.1.1
+  * [BUGFIX: skip delta analysis if there are no different commits between analyzed branch and base revision](https://github.com/jenkinsci/codescene-plugin/pull/1)
 * 1.1.0
   * Use [credentials plugin](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin)
     for storing CodeScene API credentials instead of hardcoded username and password.
