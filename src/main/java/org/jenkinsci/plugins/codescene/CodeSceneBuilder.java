@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.codescene;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 
 import com.cloudbees.plugins.credentials.CredentialsMatcher;
@@ -248,9 +249,14 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
             }
             if (isAnalyzeBranchDiff() && getBaseRevision() != null) {
                 List<String> revisions = getCommitRange(build, workspace, launcher, listener, getBaseRevision(), currentCommit);
-                CodeSceneBuildActionEntry entry = runDeltaAnalysisOnBranchDiff(codesceneConfig, revisions, branch, listener);
-                markAsUnstableWhenAtRiskThreshold(riskThreshold, entry, build, listener);
-                build.addAction(new CodeSceneBuildAction("Delta - By Branch", singletonList(entry)));
+                if (revisions.isEmpty()) {
+                    listener.getLogger().println(format("No new commits to analyze between the branch '%s' " +
+                            "and base revision '%s'.", branch, baseRevision));
+                } else {
+                    CodeSceneBuildActionEntry entry = runDeltaAnalysisOnBranchDiff(codesceneConfig, revisions, branch, listener);
+                    markAsUnstableWhenAtRiskThreshold(riskThreshold, entry, build, listener);
+                    build.addAction(new CodeSceneBuildAction("Delta - By Branch", singletonList(entry)));
+                }
             }
 
         } catch (InterruptedException | IOException e) {
@@ -282,7 +288,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
 
     private void markAsUnstableWhenAtRiskThreshold(int threshold, CodeSceneBuildActionEntry entry, Run<?, ?> build, TaskListener listener) throws IOException {
         if (isMarkBuildAsUnstable() && entry.getHitsRiskThreshold()) {
-            String link = HyperlinkNote.encodeTo(entry.getViewUrl().toExternalForm(), String.format("Delta analysis result with risk %d", entry.getRisk().getValue()));
+            String link = HyperlinkNote.encodeTo(entry.getViewUrl().toExternalForm(), format("Delta analysis result with risk %d", entry.getRisk().getValue()));
             listener.error("%s hits the risk threshold (%d). Marking build as unstable.", link, threshold);
             Result newResult = Result.UNSTABLE;
 
@@ -305,7 +311,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         launcher.launch()
-                .cmdAsSingleString(String.format("git log --pretty='%%H' %s..%s", fromRevision, toRevision))
+                .cmdAsSingleString(format("git log --pretty='%%H' %s..%s", fromRevision, toRevision))
                 .pwd(workspace)
                 .envs(build.getEnvironment(listener))
                 .stdout(out)
