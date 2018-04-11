@@ -44,6 +44,8 @@ Enter the required information in the CodeScene Jenkins configuration:
 
 ![Buildstep](buildstep.png)
 
+####  Delta Analysis Settings
+
 CodeScene gives you a number of options that controls the scope of the delta analysis:
 
 * *Individual Commits*: Check this option to run a delta analysis on each individual commit. When in doubt, make this your default setting.
@@ -54,13 +56,22 @@ You can also change the defaults for risk threshold and temporal coupling thresh
 * *Risk Threshold*: commits with risk equal or higher than this value will make a build unstable
 * *Temporal Coupling Threshold*: minimum temporal coupling for "Absence of Expected Change Pattern" warning
 
-The CodeScene API configuration section has to match the information specified inside CodeScene itself and retrievable from the analysis configuration.
+By checking the _**Use Biomarkers**_ option, CodeScene lets you auto-detect files that seem to degrade in quality through issues introduced in the current changeset.
+Biomarkers can be used since the CodeScene 2.4.0 version.
+
+#### CodeScene API Configuration
+
+The CodeScene API configuration section has to match the information specified inside CodeScene itself and retrievable from the analysis configuration (Project configuration -> Delta Analysis):
+
+![Project Configuration - Delta Analysis](project-config-delta-analysis.png)
 
 API Credentials should be added via [jenkins credentials plugin](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin).
 Check [Injecting Secrets into Jenkins Build Jobs](https://support.cloudbees.com/hc/en-us/articles/203802500-Injecting-Secrets-into-Jenkins-Build-Jobs) for more details.
 
 ## Changelog
 
+* 1.1.2
+  * Add Biomarkers support to auto-detect files that seem to degrade in quality through issues introduced in a changeset - requires CodeScene version 2.4.0 or higher.
 * 1.1.1
   * [BUGFIX: skip delta analysis if there are no different commits between analyzed branch and base revision](https://github.com/jenkinsci/codescene-plugin/pull/1)
 * 1.1.0

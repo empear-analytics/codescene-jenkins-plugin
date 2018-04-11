@@ -23,6 +23,11 @@
             <f:number field="couplingThresholdPercent" default="80" min="0" max="100" />
         </f:entry>
 
+
+        <f:optionalBlock field="useBiomarkers" title="Use Biomarkers" inline="true" default="true" checked="${it.useBiomarkers}">
+        </f:optionalBlock>
+
+        
     </f:section>
 
     <f:section title="CodeScene API Configuration">

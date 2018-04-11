@@ -63,6 +63,8 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
     private boolean markBuildAsUnstable;
     private int riskThreshold = DEFAULT_RISK_THRESHOLD;
     private int couplingThresholdPercent = DEFAULT_COUPLING_THRESHOLD_PERCENT;
+    // CodeScene 2.4.0+ supports biomarkers as a separate risk category - default: true
+    private boolean useBiomarkers = true;
 
     // deprecated authentication params - use credentialsId instead
     @Deprecated private transient String username;
@@ -113,6 +115,10 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         return couplingThresholdPercent;
     }
 
+    public boolean isUseBiomarkers() {
+        return useBiomarkers;
+    }
+
     @DataBoundSetter
     public void setAnalyzeLatestIndividually(boolean analyzeLatestIndividually) {
         this.analyzeLatestIndividually = analyzeLatestIndividually;
@@ -143,6 +149,11 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         this.couplingThresholdPercent = couplingThresholdPercent < 1 || couplingThresholdPercent > 100
                 ? DEFAULT_COUPLING_THRESHOLD_PERCENT
                 : couplingThresholdPercent;
+    }
+
+    @DataBoundSetter
+    public void setUseBiomarkers(boolean useBiomarkers) {
+        this.useBiomarkers = useBiomarkers;
     }
 
     // handle default values for new fields with regards to existing jobs (backward compatibility)
@@ -228,7 +239,7 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
             URL url = new URL(deltaAnalysisUrl);
 
             Configuration codesceneConfig = new Configuration(url, userConfig(), new Repository(repository),
-                    couplingThresholdPercent);
+                    couplingThresholdPercent, useBiomarkers);
             EnvVars env = build.getEnvironment(listener);
 
             String previousCommit = env.get("GIT_PREVIOUS_SUCCESSFUL_COMMIT");

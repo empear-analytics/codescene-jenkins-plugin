@@ -26,7 +26,7 @@ public class DeltaAnalysis {
 
     public DeltaAnalysisResult runOn(final Commits commits) {
         final DeltaAnalysisRequest payload = new DeltaAnalysisRequest(commits, config.gitRepisitoryToAnalyze(),
-                config.couplingThresholdPercent());
+                config.couplingThresholdPercent(), config.useBiomarkers());
 
         try {
             return synchronousRequestWith(payload, commits);
