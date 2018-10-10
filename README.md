@@ -70,6 +70,8 @@ Check [Injecting Secrets into Jenkins Build Jobs](https://support.cloudbees.com/
 
 ## Changelog
 
+* 1.1.3
+ * Introduce a configuration option to mark builds as UNSTABLE rather than FAILED if a remote CodeScene analysis couldn't be performed.
 * 1.1.2
   * Add Biomarkers support to auto-detect files that seem to degrade in quality through issues introduced in a changeset - requires CodeScene version 2.4.0 or higher.
 * 1.1.1
