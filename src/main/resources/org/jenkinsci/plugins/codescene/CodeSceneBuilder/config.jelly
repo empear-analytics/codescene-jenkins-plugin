@@ -27,6 +27,9 @@
         <f:optionalBlock field="useBiomarkers" title="Use Biomarkers" inline="true" default="true" checked="${it.useBiomarkers}">
         </f:optionalBlock>
 
+        <f:optionalBlock field="failBuildOnFailedAnalysis" title="Fail Build on Failed Analysis" inline="true" default="true" checked="${it.failBuildOnFailedAnalysis}">
+        </f:optionalBlock>
+
         
     </f:section>
 
