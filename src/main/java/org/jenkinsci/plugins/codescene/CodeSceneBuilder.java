@@ -181,7 +181,8 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         return commitSets;
     }
 
-    private ArrayList<CodeSceneBuildActionEntry> runDeltaAnalysesOnIndividualCommits(Configuration config, List<String> revisions, TaskListener listener) throws MalformedURLException {
+    private ArrayList<CodeSceneBuildActionEntry> runDeltaAnalysesOnIndividualCommits(Configuration config, List<String> revisions, TaskListener listener)
+            throws RemoteAnalysisException, MalformedURLException {
         List<Commits> commitSets = revisionsAsIndividualCommitSets(revisions);
         ArrayList<CodeSceneBuildActionEntry> entries = new ArrayList<>(commitSets.size());
 
@@ -214,7 +215,8 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
         return entries;
     }
 
-    private CodeSceneBuildActionEntry runDeltaAnalysisOnBranchDiff(Configuration config, List<String> revisions, String branchName, TaskListener listener) throws MalformedURLException {
+    private CodeSceneBuildActionEntry runDeltaAnalysisOnBranchDiff(Configuration config, List<String> revisions, String branchName, TaskListener listener)
+            throws RemoteAnalysisException, MalformedURLException {
         Commits commitSet = revisionsAsCommitSet(revisions);
         DeltaAnalysis deltaAnalysis = new DeltaAnalysis(config);
         listener.getLogger().format("Running delta analysis on branch %s in repository %s.%n", branchName, config.gitRepisitoryToAnalyze().value());
@@ -270,6 +272,9 @@ public class CodeSceneBuilder extends Builder implements SimpleBuildStep {
                 }
             }
 
+        } catch (RemoteAnalysisException e) {
+            listener.error("Remote failure as CodeScene couldn't perform the delta analysis: %s", e);
+            build.setResult(Result.UNSTABLE);
         } catch (InterruptedException | IOException e) {
             listener.error("Failed to run delta analysis: %s", e);
             build.setResult(Result.FAILURE);

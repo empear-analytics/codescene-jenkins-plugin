@@ -24,7 +24,7 @@ public class DeltaAnalysis {
         this.config = config;
     }
 
-    public DeltaAnalysisResult runOn(final Commits commits) {
+    public DeltaAnalysisResult runOn(final Commits commits) throws RemoteAnalysisException {
         final DeltaAnalysisRequest payload = new DeltaAnalysisRequest(commits, config.gitRepisitoryToAnalyze(),
                 config.couplingThresholdPercent(), config.useBiomarkers());
 
@@ -33,12 +33,12 @@ public class DeltaAnalysis {
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("The configured CodeScene URL isn't valid", e);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to send request to CodeScene at " + config.codeSceneUrl().toString(), e);
+            throw new RemoteAnalysisException("Failed to send request to CodeScene at " + config.codeSceneUrl().toString(), e);
         }
     }
 
 
-    private DeltaAnalysisResult synchronousRequestWith(final DeltaAnalysisRequest payload, Commits commits) throws URISyntaxException, IOException {
+    private DeltaAnalysisResult synchronousRequestWith(final DeltaAnalysisRequest payload, Commits commits) throws RemoteAnalysisException, URISyntaxException, IOException {
         final HttpPost codeSceneRequest = createRequestFor(payload);
         final CloseableHttpClient httpclient = HttpClients.createDefault();
 
@@ -59,17 +59,18 @@ public class DeltaAnalysis {
         throw new RuntimeException("Internal error: we failed to deal properly with the request.");
     }
 
-    private void reportFailureAsException(HttpResponse rawResponse) throws IOException {
+    private void reportFailureAsException(HttpResponse rawResponse) throws IOException, RemoteAnalysisException {
         final HttpEntity responseBody = rawResponse.getEntity();
         final String errorMessage = EntityUtils.toString(responseBody);
-        throw new RuntimeException(String.format("Failed to execute delta analysis. Status: %s, Reason: %s", rawResponse.getStatusLine(), errorMessage));
+
+        throw new RemoteAnalysisException(String.format("Failed to execute delta analysis. Status: %s, Reason: %s", rawResponse.getStatusLine(), errorMessage));
     }
 
-    private DeltaAnalysisResult parseSuccessfulAnalysisResults(HttpResponse rawResponse, Commits commits) throws IOException {
+    private DeltaAnalysisResult parseSuccessfulAnalysisResults(HttpResponse rawResponse, Commits commits) throws IOException, RemoteAnalysisException {
         final HttpEntity responseBody = rawResponse.getEntity();
 
         if (responseBody == null) {
-            throw new RuntimeException("Internal error: The delta analysis was a success but failed to parse the returned results");
+            throw new RemoteAnalysisException("Internal error: The delta analysis was a success but failed to parse the returned results");
         }
 
         final JsonReader reader = Json.createReader(responseBody.getContent());
