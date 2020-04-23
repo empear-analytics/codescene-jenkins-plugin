@@ -94,3 +94,35 @@ public class DeltaAnalysis {
         return codeSceneRequest;
     }
 }
+
+public class Bumpy {
+    private boolean a = true;
+    private boolean b = true;
+    private boolean c = true;
+    private boolean d = true;
+    public void bumpyMethod(){
+
+        int x = 1;
+        if (a) {
+            if (b) {
+                if (c) {
+                    if (d) {
+                        x = 100;
+                    }
+                }
+            }
+        }
+        y = 10*x;
+        z = 10;
+        if (d) {
+            if (c) {
+                if (b) {
+                    if (a) {
+                        x = y + z;
+                        z = 0;
+                    }
+                }
+            }
+        }
+    }
+}
